@@ -1,0 +1,14 @@
+---
+- name: Aplicar configuracion base a todos los servidores
+  hosts: all
+  become: true
+  roles:
+    - role: common
+
+- name: Aplicar configuracion de Router a las VMs de Router
+  hosts: router_vms
+  become: true
+  roles:
+    - role: configure_router
+    - role: manage_services
+    - role: manage_users

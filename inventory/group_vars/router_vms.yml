@@ -1,0 +1,29 @@
+---
+# Variables para la VM del Game Center
+vm_name_game: "VM-Router-Game"
+internal_if_game: "ens192" # VERIFICA ESTE NOMBRE DE INTERFAZ
+dhcp_subnet_game: "192.168.1.0"
+dhcp_netmask_game: "255.255.255.0"
+dhcp_range_start_game: "192.168.1.100"
+dhcp_range_end_game: "192.168.1.200"
+dhcp_router_game: "192.168.1.1"
+
+# Variables para la VM del Laboratorio Académico
+vm_name_acad: "VM-Router-Acad"
+internal_if_acad: "ens192" # VERIFICA ESTE NOMBRE DE INTERFAZ
+dhcp_subnet_acad: "192.168.2.0"
+dhcp_netmask_acad: "255.255.255.0"
+dhcp_range_start_acad: "192.168.2.100"
+dhcp_range_end_acad: "192.168.2.200"
+dhcp_router_acad: "192.168.2.1"
+
+# Lista de servicios a gestionar en los routers
+services_to_manage:
+  - { name: 'ufw', state: 'started', enabled: true }
+  - { name: 'sshd', state: 'started', enabled: true }
+  - { name: 'isc-dhcp-server', state: 'started', enabled: true }
+
+# Lista de usuarios a gestionar en los routers
+users_to_manage:
+  - { name: 'frodrigo', state: 'present', groups: 'sudo', sudo: true }
+  - { name: 'faguilar', state: 'present', groups: 'sudo', sudo: true }

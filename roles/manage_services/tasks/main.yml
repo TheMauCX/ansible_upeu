@@ -1,0 +1,8 @@
+---
+- name: Gestionar el estado de los servicios del sistema
+  ansible.builtin.service:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('started') }}"
+    enabled: "{{ item.enabled | default(true) }}"
+  loop: "{{ services_to_manage }}"
+  when: services_to_manage is defined

@@ -1,0 +1,50 @@
+---
+- name: 1. Aprovisionar Infraestructura para Game Center
+  hosts: ws1
+  gather_facts: no
+  vars_files:
+    - group_vars/ws1_gamecenter.yml # Asegúrate de que este archivo exista o mueve las variables a inventory/group_vars
+
+  tasks:
+    - name: "Desplegar las VMs del Game Center"
+      community.vmware.vmware_guest:
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        template: "{{ item.template }}"
+        datastore: "{{ datastore }}"
+        folder: "/{{ datastore }}/vm/"
+        state: poweredon
+        guest_id: "ubuntu64Guest"
+        hardware:
+          num_cpus: "{{ item.cpu }}"
+          memory_mb: "{{ item.memory_mb }}"
+        networks: "{{ item.networks }}"
+      loop: "{{ vms_to_create }}"
+
+- name: 2. Aprovisionar Infraestructura para Laboratorio Academico
+  hosts: ws2
+  gather_facts: no
+  vars_files:
+    - group_vars/ws2_academiclab.yml # Asegúrate de que este archivo exista o mueve las variables a inventory/group_vars
+
+  tasks:
+    - name: "Desplegar las VMs del Laboratorio Académico"
+      community.vmware.vmware_guest:
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        template: "{{ item.template }}"
+        datastore: "{{ datastore }}"
+        folder: "/{{ datastore }}/vm/"
+        state: poweredon
+        guest_id: "ubuntu64Guest"
+        hardware:
+          num_cpus: "{{ item.cpu }}"
+          memory_mb: "{{ item.memory_mb }}"
+        networks: "{{ item.networks }}"
+      loop: "{{ vms_to_create }}"

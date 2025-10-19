@@ -1,0 +1,9 @@
+---
+- name: Actualizar cache de APT e instalar paquetes comunes
+  ansible.builtin.apt:
+    name:
+      - git
+      - htop
+      - ufw
+    update_cache: yes
+    state: present
