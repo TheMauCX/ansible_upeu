@@ -1,0 +1,47 @@
+# group_vars/ws2_academiclab.yml
+---
+# Variables de conexión a ESXi (WS2)
+esxi_hostname: '172.17.25.19'
+esxi_username: 'root'
+esxi_password: 'qwe123$'
+datastore: 'datastore1' # Cambia esto si tu datastore tiene otro nombre
+
+# Variables de la red Laboratorio Académico
+vswitch_internal_name: 'vSwitch_Acad_LAN'
+network_internal_name: 'LAN_Academico'
+network_internal_subnet: '192.168.2.0'
+network_internal_netmask: '255.255.255.0'
+network_internal_gateway: '192.168.2.1'
+
+# Definición de las Máquinas Virtuales para WS2
+vms_to_create:
+  - name: 'VM-Router-Acad'
+    template: 'ubuntu-server-template'
+    cpu: 1
+    memory_mb: 1024
+    disk_size_gb: 20
+    networks:
+      - name: 'VM Network' # Red de gestión conectada a la red 192.17.25.0/24
+        type: 'dhcp'
+      - name: '{{ network_internal_name }}' # Red interna del Laboratorio
+        type: 'static'
+        ip: '192.168.2.1'
+        netmask: '255.255.255.0'
+
+  - name: 'VM-FOG-Server-Acad'
+    template: 'ubuntu-server-template'
+    cpu: 2
+    memory_mb: 4096
+    disk_size_gb: 100
+    networks:
+      - name: '{{ network_internal_name }}'
+        type: 'dhcp'
+
+  - name: 'VM-Cliente-01-Acad'
+    template: 'ubuntu-server-template' # Usarías una plantilla de Linux Mint/Windows
+    cpu: 2
+    memory_mb: 4096
+    disk_size_gb: 80
+    networks:
+      - name: '{{ network_internal_name }}'
+        type: 'dhcp'
