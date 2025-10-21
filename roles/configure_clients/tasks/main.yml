@@ -1,0 +1,10 @@
+---
+# roles/configure_clients/tasks/main.yml
+
+- name: Incluir tareas para Windows
+  ansible.builtin.include_tasks: Windows/main.yml
+  when: ansible_os_family == "Windows"
+
+- name: Incluir tareas para Linux (Debian)
+  ansible.builtin.include_tasks: Linux/main.yml
+  when: ansible_os_family == "Debian"

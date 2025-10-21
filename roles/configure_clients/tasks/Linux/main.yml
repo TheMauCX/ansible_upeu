@@ -1,0 +1,6 @@
+---
+- name: Instalar software académico con APT
+  ansible.builtin.apt:
+    name: "{{ item.name }}"
+    state: present
+    update_cache: yes

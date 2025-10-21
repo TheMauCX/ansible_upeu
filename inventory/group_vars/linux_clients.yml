@@ -1,0 +1,6 @@
+---
+# Software a instalar en los clientes de Linux Mint con APT
+academic_software_to_install:
+  - { name: 'vscode' }
+  - { name: 'gimp' }
+  - { name: 'libreoffice' }

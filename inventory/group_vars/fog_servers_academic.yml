@@ -1,0 +1,11 @@
+---
+# Paquetes a instalar en el servidor Académico
+common_packages:
+  - git
+  - htop
+  - firewalld
+
+# Usuarios a crear en el servidor Académico
+users_to_manage:
+  - { name: 'franco-acad', state: 'present', groups: 'wheel' }
+  - { name: 'rodrigo-acad', state: 'present', groups: 'wheel' }

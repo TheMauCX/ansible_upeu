@@ -1,0 +1,6 @@
+---
+- name: Instalar software de juegos con Chocolatey
+  win_chocolatey:
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ games_to_install }}"

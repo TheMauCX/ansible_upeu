@@ -1,0 +1,11 @@
+---
+# Paquetes a instalar en el servidor del Game Center
+common_packages:
+  - git
+  - htop
+  - firewalld
+
+# Usuarios a crear en el servidor del Game Center
+users_to_manage:
+  - { name: 'franco-gc', state: 'present', groups: 'wheel' }
+  - { name: 'rodrigo-gc', state: 'present', groups: 'wheel' }

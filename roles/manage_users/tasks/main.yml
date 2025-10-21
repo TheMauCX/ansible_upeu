@@ -6,13 +6,13 @@
     groups: "{{ item.groups | default(omit) }}"
     append: yes
   loop: "{{ users_to_manage }}"
-  when: users_to_manage is defined
 
-- name: Configurar permisos de sudo
+- name: Permitir al grupo 'wheel' ejecutar comandos con sudo sin contraseña
   ansible.builtin.lineinfile:
-    path: /etc/sudoers.d/90-ansible-{{ item.name }}
-    line: "{{ item.name }} ALL=(ALL) NOPASSWD: ALL"
+    path: /etc/sudoers.d/90-wheel-nopasswd
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
     create: yes
+    owner: root
+    group: root
     mode: '0440'
-  loop: "{{ users_to_manage }}"
-  when: item.sudo is defined and item.sudo == true and item.state | default('present') == 'present'
+    validate: 'visudo -cf %s'

@@ -1,0 +1,26 @@
+---
+- name: Deshabilitar SELinux (necesario para FOG)
+  ansible.posix.selinux:
+    state: disabled
+  notify: Reiniciar el servidor
+
+- name: Descargar el instalador de FOG Project
+  ansible.builtin.git:
+    repo: 'https://github.com/FOGProject/fogproject.git'
+    dest: /opt/fogproject
+
+- name: Iniciar la instalación de FOG
+  ansible.builtin.command:
+    cmd: ./installfog.sh -y
+  args:
+    chdir: /opt/fogproject/bin
+  register: fog_install_output
+
+- name: Mostrar salida de la instalación de FOG
+  ansible.builtin.debug:
+    msg: "{{ fog_install_output.stdout_lines }}"
+
+handlers:
+  - name: Reiniciar el servidor
+    ansible.builtin.reboot:
+      msg: "Reiniciando para aplicar cambios de SELinux. Re-ejecute el playbook después."
