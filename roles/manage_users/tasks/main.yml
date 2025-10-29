@@ -7,7 +7,7 @@
     append: yes
   loop: "{{ users_to_manage }}"
 
-- name: Permitir al grupo 'wheel' ejecutar comandos con sudo sin contraseña
+- name: Permitir al grupo 'wheel' ejecutar sudo sin contraseña
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/90-wheel-nopasswd
     line: '%wheel ALL=(ALL) NOPASSWD: ALL'

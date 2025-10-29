@@ -1,8 +1,7 @@
 ---
 # Credenciales para ESXi
 esxi_user: root
-esxi_password: "qwe123$" # IMPORTANTE: Usa Ansible Vault para proteger esto
 
 # Credenciales para SSH a las VMs
-ansible_user: tu_usuario_ssh # El usuario con el que te conectarás a las VMs
+ansible_user: tu_usuario_ssh
 ansible_ssh_private_key_file: /ruta/a/tu/llave_privada.pem

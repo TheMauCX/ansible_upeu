@@ -5,6 +5,8 @@
   roles:
     - role: common
     - role: manage_users
+    - role: security_hardening
+    - role: manage_storage
     - role: install_fog
 
 - name: Aplicar configuración a los servidores del Laboratorio Académico
@@ -13,4 +15,6 @@
   roles:
     - role: common
     - role: manage_users
+    - role: security_hardening
+    - role: manage_storage
     - role: install_fog

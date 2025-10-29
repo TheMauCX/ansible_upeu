@@ -1,9 +1,7 @@
 ---
-# Variables para la conexión WinRM a Windows
 ansible_connection: winrm
 ansible_winrm_server_cert_validation: ignore
 
-# Software a instalar en los clientes de Windows con Chocolatey
 games_to_install:
   - { name: 'steam' }
   - { name: 'epicgameslauncher' }

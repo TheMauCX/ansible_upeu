@@ -1,0 +1,14 @@
+---
+- name: Reiniciar sshd
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: Recargar firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded
+
+- name: Reiniciar el servidor
+  ansible.builtin.reboot:
+    msg: "Reiniciando para aplicar cambios de SELinux."

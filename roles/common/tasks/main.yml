@@ -3,9 +3,14 @@
   ansible.builtin.dnf:
     name: "{{ common_packages }}"
     state: present
+  when: ansible_os_family == "RedHat"
 
-- name: Habilitar y iniciar el servicio de firewall
+- name: Habilitar y iniciar servicios del sistema
   ansible.builtin.service:
-    name: firewalld
+    name: "{{ item }}"
     state: started
     enabled: yes
+  loop:
+    - firewalld
+    - fail2ban
+  when: ansible_os_family == "RedHat"
