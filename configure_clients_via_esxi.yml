@@ -17,7 +17,7 @@
         vm_password: "{{ vm_guest_admin_pass }}"
         vm_shell: "/bin/bash"
         vm_shell_args: "-c 'apt update'"
-      loop: "{{ vms_clients_ws2 }}"
+      loop: "{{ vms_clients_ws1 }}"
 
     - name: "Instalar software académico en {{ item_vm }}"
       community.vmware.vmware_vm_shell:
@@ -33,7 +33,7 @@
       # ELIMINAMOS EL 'loop:' DUPLICADO
       with_nested:
         - "{{ academic_software_to_install }}"
-        - "{{ vms_clients_ws2 }}"
+        - "{{ vms_clients_ws1 }}"
       vars:
         item_pkg: "{{ item[0] }}"
         item_vm: "{{ item[1] }}"
