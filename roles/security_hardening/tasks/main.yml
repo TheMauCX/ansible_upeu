@@ -10,9 +10,6 @@
     vm_password: "{{ vm_guest_admin_pass }}"
     vm_shell: "/bin/bash"
     vm_shell_args: "-c 'firewall-cmd --add-service={{ item_rule }} --permanent && firewall-cmd --reload'"
-  loop: "{{ vms_target_list }}"
-  loop_control:
-    loop_var: item_vm
   with_nested:
     - "{{ firewall_rules }}"
     - "{{ vms_target_list }}"
@@ -31,9 +28,6 @@
     vm_password: "{{ vm_guest_admin_pass }}"
     vm_shell: "/bin/bash"
     vm_shell_args: "-c \"sed -i 's/^#?{{ item_ssh.key }}.*/{{ item_ssh.key }} {{ item_ssh.value }}/' /etc/ssh/sshd_config\""
-  loop: "{{ vms_target_list }}"
-  loop_control:
-    loop_var: item_vm
   with_nested:
     - "{{ ssh_security_rules }}"
     - "{{ vms_target_list }}"
@@ -53,5 +47,3 @@
     vm_shell: "/bin/bash"
     vm_shell_args: "-c 'setenforce 1 && sed -i ''s/^SELINUX=.*/SELINUX=enforcing/'' /etc/selinux/config'"
   loop: "{{ vms_target_list }}"
-  loop_control:
-    loop_var: item_vm

@@ -10,9 +10,6 @@
     vm_password: "{{ vm_guest_admin_pass }}"
     vm_shell: "/bin/bash"
     vm_shell_args: "-c 'useradd -m -g {{ item_user.groups }} {{ item_user.name }} || usermod -g {{ item_user.groups }} {{ item_user.name }}'"
-  loop: "{{ vms_target_list }}"
-  loop_control:
-    loop_var: item_vm
   with_nested:
     - "{{ users_to_manage }}"
     - "{{ vms_target_list }}"
