@@ -1,9 +1,16 @@
 ---
-- name: Actualizar cache de APT e instalar paquetes comunes
-  ansible.builtin.apt:
-    name:
-      - git
-      - htop
-      - ufw
-    update_cache: yes
+- name: Instalar paquetes comunes
+  ansible.builtin.dnf:
+    name: "{{ common_packages }}"
     state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Habilitar y iniciar servicios del sistema
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - firewalld
+    - fail2ban
+  when: ansible_os_family == "RedHat"

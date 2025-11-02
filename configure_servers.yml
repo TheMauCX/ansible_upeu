@@ -1,14 +1,20 @@
 ---
-- name: Aplicar configuracion base a todos los servidores
-  hosts: all
+- name: Aplicar configuración a los servidores del Game Center
+  hosts: fog_servers_gamecenter
   become: true
   roles:
     - role: common
+    - role: manage_users
+    - role: security_hardening
+    - role: manage_storage
+    - role: install_fog
 
-- name: Aplicar configuracion de Router a las VMs de Router
-  hosts: router_vms
+- name: Aplicar configuración a los servidores del Laboratorio Académico
+  hosts: fog_servers_academic
   become: true
   roles:
-    - role: configure_router
-    - role: manage_services
+    - role: common
     - role: manage_users
+    - role: security_hardening
+    - role: manage_storage
+    - role: install_fog

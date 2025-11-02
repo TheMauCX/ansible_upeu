@@ -1,50 +1,44 @@
 ---
-- name: 1. Aprovisionar Infraestructura para Game Center
+- name: Aprovisionar Laboratorio Game Center en Workstation 1
   hosts: ws1
   gather_facts: no
-  vars_files:
-    - group_vars/ws1_gamecenter.yml # Asegúrate de que este archivo exista o mueve las variables a inventory/group_vars
 
   tasks:
-    - name: "Desplegar las VMs del Game Center"
+    - name: "Crear VMs del Game Center"
       community.vmware.vmware_guest:
-        hostname: "{{ esxi_hostname }}"
-        username: "{{ esxi_username }}"
+        hostname: "{{ ansible_host }}"
+        username: "{{ esxi_user }}"
         password: "{{ esxi_password }}"
         validate_certs: no
         name: "{{ item.name }}"
         template: "{{ item.template }}"
-        datastore: "{{ datastore }}"
-        folder: "/{{ datastore }}/vm/"
+        datastore: "datastore1"
+        folder: "/"
         state: poweredon
-        guest_id: "ubuntu64Guest"
-        hardware:
-          num_cpus: "{{ item.cpu }}"
-          memory_mb: "{{ item.memory_mb }}"
-        networks: "{{ item.networks }}"
-      loop: "{{ vms_to_create }}"
+        guest_id: "{{ item.guest_id }}"
+      loop:
+        - { name: 'pfSense-Router-GameCenter', template: 'pfsense-template', guest_id: 'freebsd64Guest' }
+        - { name: 'Server-Almalinux-GameCenter', template: 'almalinux-template', guest_id: 'almalinux_64Guest' }
+        - { name: 'Cliente-Win11-GameCenter-01', template: 'windows11-home-template', guest_id: 'windows11_64Guest' }
 
-- name: 2. Aprovisionar Infraestructura para Laboratorio Academico
+- name: Aprovisionar Laboratorio Académico en Workstation 2
   hosts: ws2
   gather_facts: no
-  vars_files:
-    - group_vars/ws2_academiclab.yml # Asegúrate de que este archivo exista o mueve las variables a inventory/group_vars
 
   tasks:
-    - name: "Desplegar las VMs del Laboratorio Académico"
+    - name: "Crear VMs del Laboratorio Académico"
       community.vmware.vmware_guest:
-        hostname: "{{ esxi_hostname }}"
-        username: "{{ esxi_username }}"
+        hostname: "{{ ansible_host }}"
+        username: "{{ esxi_user }}"
         password: "{{ esxi_password }}"
         validate_certs: no
         name: "{{ item.name }}"
         template: "{{ item.template }}"
-        datastore: "{{ datastore }}"
-        folder: "/{{ datastore }}/vm/"
+        datastore: "datastore1"
+        folder: "/"
         state: poweredon
-        guest_id: "ubuntu64Guest"
-        hardware:
-          num_cpus: "{{ item.cpu }}"
-          memory_mb: "{{ item.memory_mb }}"
-        networks: "{{ item.networks }}"
-      loop: "{{ vms_to_create }}"
+        guest_id: "{{ item.guest_id }}"
+      loop:
+        - { name: 'pfSense-Router-Academic', template: 'pfsense-template', guest_id: 'freebsd64Guest' }
+        - { name: 'Server-Almalinux-Academic', template: 'almalinux-template', guest_id: 'almalinux_64Guest' }
+        - { name: 'Cliente-Win11-Academic-01', template: 'windows11-home-template', guest_id: 'windows11_64Guest' }

@@ -1,0 +1,17 @@
+---
+- name: Descargar el instalador de FOG Project
+  ansible.builtin.git:
+    repo: 'https://github.com/FOGProject/fogproject.git'
+    dest: /opt/fogproject
+    version: '1.5.10'
+
+- name: Iniciar la instalación de FOG
+  ansible.builtin.command:
+    cmd: ./installfog.sh -y
+  args:
+    chdir: /opt/fogproject/bin
+  register: fog_install_output
+
+- name: Mostrar salida de la instalación de FOG
+  ansible.builtin.debug:
+    msg: "{{ fog_install_output.stdout_lines }}"

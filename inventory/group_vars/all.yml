@@ -1,3 +1,7 @@
 ---
+# Credenciales para ESXi
+esxi_user: root
+
+# Credenciales para SSH a las VMs
 ansible_user: tu_usuario_ssh
 ansible_ssh_private_key_file: /ruta/a/tu/llave_privada.pem

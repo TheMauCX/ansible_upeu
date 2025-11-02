@@ -1,0 +1,28 @@
+---
+- name: Configurar SSH para que sea más seguro
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    validate: 'sshd -t -f %s'
+  loop:
+    - { key: 'PermitRootLogin', value: 'no' }
+    - { key: 'PasswordAuthentication', value: 'no' }
+  notify: Reiniciar sshd
+
+- name: Asegurar que SELinux esté en modo 'enforcing'
+  ansible.posix.selinux:
+    policy: targeted
+    state: enforcing
+  notify: Reiniciar el servidor
+
+- name: Añadir reglas de firewall para servicios (SSH y FOG)
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - ssh
+    - http
+    - https
+  notify: Recargar firewalld

@@ -1,0 +1,5 @@
+---
+academic_software_to_install:
+  - { name: 'vscode' }
+  - { name: 'gimp' }
+  - { name: 'libreoffice' }
