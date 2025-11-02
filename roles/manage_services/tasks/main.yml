@@ -1,0 +1,40 @@
+---
+- name: "Asegurar que los paquetes estén instalados"
+  community.vmware.vmware_guest_shell:
+    hostname: "{{ ansible_host }}"
+    username: "{{ esxi_user }}"
+    password: "{{ esxi_password }}"
+    validate_certs: no
+    vm_username: "{{ vm_guest_admin_user }}"
+    vm_password: "{{ vm_guest_admin_pass }}"
+    vm_name: "{{ item_vm }}"
+    guest_shell: "dnf install -y {{ item_pkg }}"
+  loop: "{{ vms_target_list }}"
+  loop_control:
+    loop_var: item_vm
+  with_nested:
+    - "{{ common_packages }}"
+    - "{{ vms_target_list }}"
+  vars:
+    item_pkg: "{{ item[0] }}"
+    item_vm: "{{ item[1] }}"
+
+- name: "Asegurar que los servicios estén iniciados y habilitados"
+  community.vmware.vmware_guest_shell:
+    hostname: "{{ ansible_host }}"
+    username: "{{ esxi_user }}"
+    password: "{{ esxi_password }}"
+    validate_certs: no
+    vm_username: "{{ vm_guest_admin_user }}"
+    vm_password: "{{ vm_guest_admin_pass }}"
+    vm_name: "{{ item_vm }}"
+    guest_shell: "systemctl enable --now {{ item_svc }}"
+  loop: "{{ vms_target_list }}"
+  loop_control:
+    loop_var: item_vm
+  with_nested:
+    - "{{ services_to_manage }}"
+    - "{{ vms_target_list }}"
+  vars:
+    item_svc: "{{ item[0] }}"
+    item_vm: "{{ item[1] }}"

@@ -1,0 +1,36 @@
+---
+- name: Configurar VMs de FOG en WS1 (Sin SSH)
+  hosts: ws1
+  gather_facts: no
+
+  tasks:
+    - name: "Aplicar roles de configuración a {{ vms_fog_ws1 }}"
+      include_role:
+        name: "{{ item_role }}"
+      loop:
+        - manage_services
+        - manage_users
+        - manage_storage
+        - security_hardening
+      loop_control:
+        loop_var: item_role
+      vars:
+        vms_target_list: "{{ vms_fog_ws1 }}"
+
+- name: Configurar VMs de FOG en WS2 (Sin SSH)
+  hosts: ws2
+  gather_facts: no
+
+  tasks:
+    - name: "Aplicar roles de configuración a {{ vms_fog_ws2 }}"
+      include_role:
+        name: "{{ item_role }}"
+      loop:
+        - manage_services
+        - manage_users
+        - manage_storage
+        - security_hardening
+      loop_control:
+        loop_var: item_role
+      vars:
+        vms_target_list: "{{ vms_fog_ws2 }}"

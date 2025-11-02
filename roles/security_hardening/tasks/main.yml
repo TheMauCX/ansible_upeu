@@ -1,28 +1,54 @@
 ---
-- name: Configurar SSH para que sea más seguro
-  ansible.builtin.lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?{{ item.key }}"
-    line: "{{ item.key }} {{ item.value }}"
-    validate: 'sshd -t -f %s'
-  loop:
-    - { key: 'PermitRootLogin', value: 'no' }
-    - { key: 'PasswordAuthentication', value: 'no' }
-  notify: Reiniciar sshd
+- name: "Aplicar reglas de firewall (Firewalld)"
+  community.vmware.vmware_guest_shell:
+    hostname: "{{ ansible_host }}"
+    username: "{{ esxi_user }}"
+    password: "{{ esxi_password }}"
+    validate_certs: no
+    vm_username: "{{ vm_guest_admin_user }}"
+    vm_password: "{{ vm_guest_admin_pass }}"
+    vm_name: "{{ item_vm }}"
+    guest_shell: "firewall-cmd --add-service={{ item_rule }} --permanent && firewall-cmd --reload"
+  loop: "{{ vms_target_list }}"
+  loop_control:
+    loop_var: item_vm
+  with_nested:
+    - "{{ firewall_rules }}"
+    - "{{ vms_target_list }}"
+  vars:
+    item_rule: "{{ item[0] }}"
+    item_vm: "{{ item[1] }}"
 
-- name: Asegurar que SELinux esté en modo 'enforcing'
-  ansible.posix.selinux:
-    policy: targeted
-    state: enforcing
-  notify: Reiniciar el servidor
+- name: "Reforzar la seguridad de SSH"
+  community.vmware.vmware_guest_shell:
+    hostname: "{{ ansible_host }}"
+    username: "{{ esxi_user }}"
+    password: "{{ esxi_password }}"
+    validate_certs: no
+    vm_username: "{{ vm_guest_admin_user }}"
+    vm_password: "{{ vm_guest_admin_pass }}"
+    vm_name: "{{ item_vm }}"
+    guest_shell: "sed -i 's/^#?{{ item_ssh.key }}.*/{{ item_ssh.key }} {{ item_ssh.value }}/' /etc/ssh/sshd_config"
+  loop: "{{ vms_target_list }}"
+  loop_control:
+    loop_var: item_vm
+  with_nested:
+    - "{{ ssh_security_rules }}"
+    - "{{ vms_target_list }}"
+  vars:
+    item_ssh: "{{ item[0] }}"
+    item_vm: "{{ item[1] }}"
 
-- name: Añadir reglas de firewall para servicios (SSH y FOG)
-  ansible.posix.firewalld:
-    service: "{{ item }}"
-    permanent: yes
-    state: enabled
-  loop:
-    - ssh
-    - http
-    - https
-  notify: Recargar firewalld
+- name: "Asegurar que SELinux esté en modo 'enforcing'"
+  community.vmware.vmware_guest_shell:
+    hostname: "{{ ansible_host }}"
+    username: "{{ esxi_user }}"
+    password: "{{ esxi_password }}"
+    validate_certs: no
+    vm_username: "{{ vm_guest_admin_user }}"
+    vm_password: "{{ vm_guest_admin_pass }}"
+    vm_name: "{{ item_vm }}"
+    guest_shell: "setenforce 1 && sed -i 's/^SELINUX=.*/SELINUX=enforcing/' /etc/selinux/config"
+  loop: "{{ vms_target_list }}"
+  loop_control:
+    loop_var: item_vm

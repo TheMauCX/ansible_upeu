@@ -1,0 +1,36 @@
+---
+# Lista de VMs de FOG en WS1
+vms_fog_ws1:
+  - "Server-Almalinux-GameCenter"
+
+# Lista de VMs de FOG en WS2
+vms_fog_ws2:
+  - "Server-Almalinux-Academic"
+
+# Tareas para Entregable 2 y 3
+common_packages:
+  - git
+  - htop
+  - firewalld
+  - fail2ban
+
+users_to_manage:
+  - { name: 'franco', state: 'present', groups: 'wheel' }
+  - { name: 'rodrigo', state: 'present', groups: 'wheel' }
+
+storage_volumes_to_manage:
+  - { device: '/dev/sdb', fstype: 'ext4', path: '/mnt/fog_images' }
+
+services_to_manage:
+  - firewalld
+  - fail2ban
+  - sshd
+
+ssh_security_rules:
+  - { key: 'PermitRootLogin', value: 'no' }
+  - { key: 'PasswordAuthentication', value: 'no' }
+
+firewall_rules:
+  - ssh
+  - http
+  - https

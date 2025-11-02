@@ -1,18 +1,20 @@
 ---
-- name: Gestionar cuentas de usuario
-  ansible.builtin.user:
-    name: "{{ item.name }}"
-    state: "{{ item.state | default('present') }}"
-    groups: "{{ item.groups | default(omit) }}"
-    append: yes
-  loop: "{{ users_to_manage }}"
-
-- name: Permitir al grupo 'wheel' ejecutar sudo sin contraseña
-  ansible.builtin.lineinfile:
-    path: /etc/sudoers.d/90-wheel-nopasswd
-    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
-    create: yes
-    owner: root
-    group: root
-    mode: '0440'
-    validate: 'visudo -cf %s'
+- name: "Gestionar cuentas de usuario"
+  community.vmware.vmware_guest_shell:
+    hostname: "{{ ansible_host }}"
+    username: "{{ esxi_user }}"
+    password: "{{ esxi_password }}"
+    validate_certs: no
+    vm_username: "{{ vm_guest_admin_user }}"
+    vm_password: "{{ vm_guest_admin_pass }}"
+    vm_name: "{{ item_vm }}"
+    guest_shell: "useradd -m -g {{ item_user.groups }} {{ item_user.name }} || usermod -g {{ item_user.groups }} {{ item_user.name }}"
+  loop: "{{ vms_target_list }}"
+  loop_control:
+    loop_var: item_vm
+  with_nested:
+    - "{{ users_to_manage }}"
+    - "{{ vms_target_list }}"
+  vars:
+    item_user: "{{ item[0] }}"
+    item_vm: "{{ item[1] }}"
