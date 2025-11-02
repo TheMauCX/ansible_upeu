@@ -1,5 +1,10 @@
 ---
+# Lista de VMs de Linux Mint en WS2
+vms_clients_ws1:
+  - "Cliente-LinuxMint-Aguilar"
+
+# Software académico a instalar (usa nombres de apt)
 academic_software_to_install:
-  - { name: 'vscode' }
-  - { name: 'gimp' }
-  - { name: 'libreoffice' }
+  - "code"        # (Visual Studio Code)
+  - "gimp"
+  - "libreoffice"
