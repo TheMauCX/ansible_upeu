@@ -1,34 +1,35 @@
-# configure_clients_via_esxi.yml
 ---
 - name: Configurar VMs de Clientes Linux en WS2 (Sin SSH)
-  hosts: ws1
+  hosts: ws2
   gather_facts: no
   vars_files:
     - inventory/group_vars/linux_clients.yml
 
   tasks:
     - name: "Actualizar repositorios APT (solo una vez)"
-      community.vmware.vmware_guest_shell:
+      community.vmware.vmware_vm_shell:
         hostname: "{{ ansible_host }}"
         username: "{{ esxi_user }}"
         password: "{{ esxi_password }}"
         validate_certs: no
+        vm_name: "{{ item }}"
         vm_username: "{{ vm_guest_admin_user }}"
         vm_password: "{{ vm_guest_admin_pass }}"
-        vm_name: "{{ item }}" # Se ejecuta 1 vez en cada VM
-        guest_shell: "apt update"
+        vm_shell: "/bin/bash"
+        vm_shell_args: "-c 'apt update'"
       loop: "{{ vms_clients_ws1 }}"
 
     - name: "Instalar software académico en {{ item_vm }}"
-      community.vmware.vmware_guest_shell:
+      community.vmware.vmware_vm_shell:
         hostname: "{{ ansible_host }}"
         username: "{{ esxi_user }}"
         password: "{{ esxi_password }}"
         validate_certs: no
+        vm_name: "{{ item_vm }}"
         vm_username: "{{ vm_guest_admin_user }}"
         vm_password: "{{ vm_guest_admin_pass }}"
-        vm_name: "{{ item_vm }}"
-        guest_shell: "apt install -y {{ item_pkg }}"
+        vm_shell: "/bin/bash"
+        vm_shell_args: "-c 'apt install -y {{ item_pkg }}'"
       loop: "{{ vms_clients_ws1 }}"
       loop_control:
         loop_var: item_vm

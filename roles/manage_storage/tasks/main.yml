@@ -1,20 +1,23 @@
 ---
 - name: "Formatear y montar volúmenes de almacenamiento"
-  community.vmware.vmware_guest_shell:
+  community.vmware.vmware_vm_shell:
     hostname: "{{ ansible_host }}"
     username: "{{ esxi_user }}"
     password: "{{ esxi_password }}"
     validate_certs: no
+    vm_name: "{{ item_vm }}"
     vm_username: "{{ vm_guest_admin_user }}"
     vm_password: "{{ vm_guest_admin_pass }}"
-    vm_name: "{{ item_vm }}"
-    guest_shell: |
+    vm_shell: "/bin/bash"
+    vm_shell_args: |
+      -c '
       (
         mkfs.{{ item_vol.fstype }} {{ item_vol.device }} &&
         mkdir -p {{ item_vol.path }} &&
         mount {{ item_vol.device }} {{ item_vol.path }} &&
-        echo '{{ item_vol.device }} {{ item_vol.path }} {{ item_vol.fstype }} defaults 0 0' >> /etc/fstab
-      ) || echo 'El disco ya está montado o hubo un error'
+        echo "{{ item_vol.device }} {{ item_vol.path }} {{ item_vol.fstype }} defaults 0 0" >> /etc/fstab
+      ) || echo "El disco ya está montado o hubo un error"
+      '
   loop: "{{ vms_target_list }}"
   loop_control:
     loop_var: item_vm
