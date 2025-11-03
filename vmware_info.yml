@@ -1,0 +1,30 @@
+# vmware_info.yml
+
+- name: Gather ESXi server information
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  
+  vars:
+    esxi_hostname: "168.121.48.254"
+    esxi_port: 10117 
+    esxi_username: 'root'
+    esxi_password: 'qwe123$'
+    ansible_python_interpreter: /home/rofriz/ansible_upeu/venv/bin/python
+    
+
+  tasks:
+    # TASK 1 & 2: Successful connection and host info display
+    - name: Provide information about a standalone ESXi server
+      community.vmware.vmware_about_info:
+        hostname: '{{ esxi_hostname }}'
+        port: '{{ esxi_port }}'
+        username: '{{ esxi_username }}'
+        password: '{{ esxi_password }}'
+        validate_certs: False
+      delegate_to: localhost
+      register: esxi_about_info
+
+    - name: Display ESXi information
+      ansible.builtin.debug:
+        var: esxi_about_info.about_info
