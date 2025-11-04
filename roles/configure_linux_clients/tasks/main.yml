@@ -1,4 +1,5 @@
 ---
+# roles/configure_linux_clients/tasks/main.yml
 - name: "Clientes Linux | Instalar software académico"
   ansible.builtin.apt:
     name: "{{ item }}"
