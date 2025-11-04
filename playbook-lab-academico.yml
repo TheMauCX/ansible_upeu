@@ -10,25 +10,22 @@
       tags: [always]
 
   roles:
-    # Entregable 2 y 3
     - role: common
     - role: manage_users
     - role: security_hardening
     - role: manage_storage
-    - role: manage_maintenance
+    #- role: manage_maintenance
     
-    # Rol específico del proyecto
-    - role: install_fog
+    #- role: install_fog
   
-  post_tasks:
-    - name: "Configuración del servidor completada"
-      ansible.builtin.debug:
-        msg: "El servidor FOG ha sido configurado y asegurado."
+  #post_tasks:
+  #  - name: "Configuración del servidor completada"
+  #    ansible.builtin.debug:
+  #      msg: "El servidor FOG ha sido configurado y asegurado."
 
 - name: "Fase 2: Configurar Clientes del Laboratorio (Linux Mint)"
   hosts: linux_clients
-  become: true # Los comandos 'apt' requieren sudo
-  
+  become: true
   pre_tasks:
     - name: "Verificar conectividad SSH con los clientes"
       ansible.builtin.ping:
