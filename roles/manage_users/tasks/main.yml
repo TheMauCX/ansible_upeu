@@ -15,7 +15,7 @@
     append: yes
     shell: /bin/bash
     create_home: yes
-    password: "{{ user_passwords[item.name] }}"
+    password: "123456"
   loop:
     - { name: 'franco', comment: 'Admin Total (Entregable 2)', groups: 'wheel,admin' }
     - { name: 'rodrigo', comment: 'Tecnico de Laboratorio (Entregable 2)', groups: 'tech_lab' }
