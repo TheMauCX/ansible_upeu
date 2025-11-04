@@ -1,5 +1,7 @@
 ---
 # Software a instalar en los clientes Linux Mint
+
+ansible_user: cliente
 academic_software_to_install:
   - code
   - gimp
