@@ -1,7 +1,4 @@
 ---
-# Credenciales para ESXi
-esxi_user: root
-
-# Credenciales para DENTRO de las VMs (para que VMware Tools ejecute comandos)
-# Asumimos que todas las VMs Linux tienen el mismo usuario 'root' y contraseña
-vm_guest_admin_user: root
+# Variables globales no secretas
+ansible_user: root
+ansible_python_interpreter: /usr/bin/python3

@@ -1,16 +1,19 @@
 ---
-- name: Instalar paquetes comunes
+- name: "Instalar paquetes base (dnf-plugins, EPEL, git)"
   ansible.builtin.dnf:
-    name: "{{ common_packages }}"
+    name:
+      - git
+      - htop
+      - dnf-plugins-core
+      - epel-release
     state: present
-  when: ansible_os_family == "RedHat"
 
-- name: Habilitar y iniciar servicios del sistema
-  ansible.builtin.service:
-    name: "{{ item }}"
+- name: "Habilitar repositorio CRB (para AlmaLinux 9+)"
+  ansible.builtin.command: dnf config-manager --set-enabled crb
+  changed_when: false
+
+- name: "Habilitar servicios base (chrony)"
+  ansible.builtin.systemd:
+    name: chronyd
+    enabled: true
     state: started
-    enabled: yes
-  loop:
-    - firewalld
-    - fail2ban
-  when: ansible_os_family == "RedHat"

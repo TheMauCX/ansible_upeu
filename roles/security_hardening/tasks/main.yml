@@ -1,49 +1,56 @@
 ---
-- name: "Aplicar reglas de firewall (Firewalld)"
-  community.vmware.vmware_vm_shell:
-    hostname: "{{ ansible_host }}"
-    username: "{{ esxi_user }}"
-    password: "{{ esxi_password }}"
-    validate_certs: no
-    vm_name: "{{ item_vm }}"
-    vm_username: "{{ vm_guest_admin_user }}"
-    vm_password: "{{ vm_guest_admin_pass }}"
-    vm_shell: "/bin/bash"
-    vm_shell_args: "-c 'firewall-cmd --add-service={{ item_rule }} --permanent && firewall-cmd --reload'"
-  with_nested:
-    - "{{ firewall_rules }}"
-    - "{{ vms_target_list }}"
-  vars:
-    item_rule: "{{ item[0] }}"
-    item_vm: "{{ item[1] }}"
+- name: "Instalar Fail2Ban y Firewalld"
+  ansible.builtin.dnf:
+    name:
+      - fail2ban
+      - firewalld
+    state: present
 
-- name: "Reforzar la seguridad de SSH"
-  community.vmware.vmware_vm_shell:
-    hostname: "{{ ansible_host }}"
-    username: "{{ esxi_user }}"
-    password: "{{ esxi_password }}"
-    validate_certs: no
-    vm_name: "{{ item_vm }}"
-    vm_username: "{{ vm_guest_admin_user }}"
-    vm_password: "{{ vm_guest_admin_pass }}"
-    vm_shell: "/bin/bash"
-    vm_shell_args: "-c \"sed -i 's/^#?{{ item_ssh.key }}.*/{{ item_ssh.key }} {{ item_ssh.value }}/' /etc/ssh/sshd_config\""
-  with_nested:
-    - "{{ ssh_security_rules }}"
-    - "{{ vms_target_list }}"
-  vars:
-    item_ssh: "{{ item[0] }}"
-    item_vm: "{{ item[1] }}"
+- name: "Configurar jail de Fail2Ban para SSH"
+  ansible.builtin.template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+  notify: Reiniciar fail2ban
+
+- name: "Habilitar servicios de seguridad (firewalld, fail2ban)"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - firewalld
+    - fail2ban
+
+- name: "Configurar reglas de Firewall para FOG"
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - ssh
+    - http
+    - https
+    - ftp
+    - tftp
+
+- name: "Copiar banner de advertencia de SSH"
+  ansible.builtin.copy:
+    src: sshd_banner.txt
+    dest: /etc/ssh/sshd_banner
+
+- name: "Reforzar configuración de sshd (sin root, sin password)"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+  loop:
+    - { key: 'PermitRootLogin', value: 'no' }
+    - { key: 'PasswordAuthentication', value: 'no' }
+    - { key: 'Banner', value: '/etc/ssh/sshd_banner' }
+  notify: Reiniciar sshd
 
 - name: "Asegurar que SELinux esté en modo 'enforcing'"
-  community.vmware.vmware_vm_shell:
-    hostname: "{{ ansible_host }}"
-    username: "{{ esxi_user }}"
-    password: "{{ esxi_password }}"
-    validate_certs: no
-    vm_name: "{{ item_vm }}"
-    vm_username: "{{ vm_guest_admin_user }}"
-    vm_password: "{{ vm_guest_admin_pass }}"
-    vm_shell: "/bin/bash"
-    vm_shell_args: "-c 'setenforce 1 && sed -i ''s/^SELINUX=.*/SELINUX=enforcing/'' /etc/selinux/config'"
-  loop: "{{ vms_target_list }}"
+  ansible.posix.selinux:
+    policy: targeted
+    state: enforcing

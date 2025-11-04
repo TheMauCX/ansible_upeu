@@ -1,0 +1,38 @@
+---
+- name: "Copiar script de actualización semanal"
+  ansible.builtin.copy:
+    src: update_system.sh
+    dest: /usr/local/bin/update_system.sh
+    mode: '0755'
+
+- name: "Crear temporizador de Systemd para actualizaciones"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/weekly-updates.timer
+    content: |
+      [Unit]
+      Description=Ejecuta actualizaciones del sistema semanalmente
+      
+      [Timer]
+      OnCalendar=Sun 03:00:00
+      Persistent=true
+      
+      [Install]
+      WantedBy=timers.target
+
+- name: "Crear servicio de Systemd para actualizaciones"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/weekly-updates.service
+    content: |
+      [Unit]
+      Description=Script de actualización semanal
+      
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/update_system.sh
+
+- name: "Habilitar e iniciar el temporizador"
+  ansible.builtin.systemd:
+    name: weekly-updates.timer
+    enabled: true
+    state: started
+    daemon_reload: yes

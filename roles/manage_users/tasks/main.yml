@@ -1,18 +1,37 @@
 ---
-- name: "Gestionar cuentas de usuario"
-  community.vmware.vmware_vm_shell:
-    hostname: "{{ ansible_host }}"
-    username: "{{ esxi_user }}"
-    password: "{{ esxi_password }}"
-    validate_certs: no
-    vm_name: "{{ item_vm }}"
-    vm_username: "{{ vm_guest_admin_user }}"
-    vm_password: "{{ vm_guest_admin_pass }}"
-    vm_shell: "/bin/bash"
-    vm_shell_args: "-c 'useradd -m -g {{ item_user.groups }} {{ item_user.name }} || usermod -g {{ item_user.groups }} {{ item_user.name }}'"
-  with_nested:
-    - "{{ users_to_manage }}"
-    - "{{ vms_target_list }}"
-  vars:
-    item_user: "{{ item[0] }}"
-    item_vm: "{{ item[1] }}"
+- name: "Crear grupos de roles (admin, tech_lab)"
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - admin
+    - tech_lab
+
+- name: "Crear usuarios del laboratorio (franco, rodrigo)"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    groups: "{{ item.groups }}"
+    append: yes
+    shell: /bin/bash
+    create_home: yes
+    password: "{{ user_passwords[item.name] }}"
+  loop:
+    - { name: 'franco', comment: 'Admin Total (Entregable 2)', groups: 'wheel,admin' }
+    - { name: 'rodrigo', comment: 'Tecnico de Laboratorio (Entregable 2)', groups: 'tech_lab' }
+
+- name: "Sudoers para Admin (full root)"
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/01-admin-upeu
+    mode: '0440'
+    content: |
+      # Permisos para rol Admin (franco)
+      %admin ALL=(ALL) NOPASSWD: ALL
+
+- name: "Sudoers para Tecnico (permisos limitados)"
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/02-tech-lab-upeu
+    mode: '0440'
+    content: |
+      # Permisos para rol Tecnico (rodrigo)
+      %tech_lab ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart *, /usr/bin/systemctl status *, /usr/bin/journalctl *

@@ -1,0 +1,7 @@
+---
+- name: "Clientes Linux | Instalar software académico"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop: "{{ academic_software_to_install }}"

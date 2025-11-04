@@ -1,26 +1,23 @@
 ---
-- name: "Formatear y montar volúmenes de almacenamiento"
-  community.vmware.vmware_vm_shell:
-    hostname: "{{ ansible_host }}"
-    username: "{{ esxi_user }}"
-    password: "{{ esxi_password }}"
-    validate_certs: no
-    vm_name: "{{ item_vm }}"
-    vm_username: "{{ vm_guest_admin_user }}"
-    vm_password: "{{ vm_guest_admin_pass }}"
-    vm_shell: "/bin/bash"
-    vm_shell_args: |
-      -c '
-      (
-        mkfs.{{ item_vol.fstype }} {{ item_vol.device }} &&
-        mkdir -p {{ item_vol.path }} &&
-        mount {{ item_vol.device }} {{ item_vol.path }} &&
-        echo "{{ item_vol.device }} {{ item_vol.path }} {{ item_vol.fstype }} defaults 0 0" >> /etc/fstab
-      ) || echo "El disco ya está montado o hubo un error"
-      '
-  with_nested:
-    - "{{ storage_volumes_to_manage }}"
-    - "{{ vms_target_list }}"
-  vars:
-    item_vol: "{{ item[0] }}"
-    item_vm: "{{ item[1] }}"
+- name: "Instalar utilidades de disco (e2fsprogs)"
+  ansible.builtin.dnf:
+    name: e2fsprogs
+    state: present
+
+- name: "Crear sistema de archivos ext4 en /dev/sdb"
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/sdb
+
+- name: "Crear punto de montaje para imágenes FOG"
+  ansible.builtin.file:
+    path: /mnt/fog_images
+    state: directory
+    mode: '0755'
+
+- name: "Montar disco de imágenes FOG permanentemente"
+  ansible.posix.mount:
+    path: /mnt/fog_images
+    src: /dev/sdb
+    fstype: ext4
+    state: mounted
