@@ -1,4 +1,7 @@
 ---
-# Variables globales no secretas
-ansible_become_password: "qwe123$"
+# Usuario que usas para conectarte/administrar
+ansible_user: server-almalinux-aguilar
+
+# Contraseña Sudo (se toma del vault)
+ansible_become_password: "{{ vault_sudo_password }}"
 ansible_python_interpreter: /usr/bin/python3
