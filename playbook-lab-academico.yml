@@ -13,8 +13,8 @@
     - role: common
     - role: manage_users
     - role: security_hardening
-    - role: manage_storage
-    #- role: manage_maintenance
+    #- role: manage_storage
+    - role: manage_maintenance
     
     #- role: install_fog
   
