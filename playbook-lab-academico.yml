@@ -2,30 +2,29 @@
 - name: "Fase 1: Configurar el Servidor FOG (AlmaLinux)"
   hosts: almalinux_control_node
   become: true
-  
-  pre_tasks:
-    - name: "Actualizar caché de DNF"
-      ansible.builtin.dnf:
-        update_cache: yes
-      tags: [always]
-
   roles:
     - role: common
     - role: manage_users
     - role: security_hardening
-    #- role: manage_storage
     - role: manage_maintenance
-    
-    #- role: install_fog
-  
-  #post_tasks:
-  #  - name: "Configuración del servidor completada"
-  #    ansible.builtin.debug:
-  #      msg: "El servidor FOG ha sido configurado y asegurado."
+    # - role: manage_storage  # Descomenta cuando puedas añadir el disco
+    # - role: install_fog
 
-- name: "Fase 2: Configurar Clientes del Laboratorio (Linux Mint)"
-  hosts: linux_clients
-  become: true
+- name: "Fase 2: Configurar Clientes del Game Center (Windows)"
+  hosts: windows_clients_gamecenter
+  
+  pre_tasks:
+    - name: "Verificar conectividad WinRM con los clientes"
+      ansible.windows.win_ping:
+      tags: [always]
+
+  roles:
+    - role: configure_windows_clients
+
+- name: "Fase 3: Configurar Clientes del Laboratorio (Linux Mint)"
+  hosts: linux_clients_academic
+  become: true # 'apt' requiere sudo
+  
   pre_tasks:
     - name: "Verificar conectividad SSH con los clientes"
       ansible.builtin.ping:

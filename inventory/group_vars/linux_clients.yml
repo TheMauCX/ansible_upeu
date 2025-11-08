@@ -1,6 +1,6 @@
 ---
 
-ansible_user: cliente
+ansible_user: linux
 
 ansible_become_password: "123456"
 academic_software_to_install:
