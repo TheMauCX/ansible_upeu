@@ -1,13 +1,20 @@
 ---
-# --- Configuración de Conexión para Windows ---
+# --- Configuración de Conexión ---
 
-# Usuario administrador en tus VMs cliente de Windows
+# Usuario administrador en tu VM cliente de Windows
 ansible_user: Cliente-Win11-Home
-ansible_become_password: "qwe123$"
+ansible_password: 'qwe123$'
 
-# Usar WinRM (protocolo de Windows) en lugar de SSH
+# ¡ESTA ES LA LÍNEA MÁGICA!
+# Le dice a Ansible que use WinRM en lugar de SSH
 ansible_connection: winrm
 
-# Ajustes de WinRM (necesarios para la mayoría de las conexiones)
+# Ajustes de WinRM (casi siempre necesarios)
 ansible_winrm_server_cert_validation: ignore
 ansible_winrm_transport: ntlm
+
+# --- Variables del Rol ---
+# (El rol 'configure_windows_clients' usa estas)
+games_to_install:
+  - { name: 'steam' }
+  - { name: 'epicgameslauncher' }
