@@ -3,7 +3,7 @@
 
 # Usuario administrador en tus VMs cliente de Windows
 ansible_user: Cliente-Win11-Home
-ansible_password: "qwe123$"
+ansible_become_password: "qwe123$"
 
 # Usar WinRM (protocolo de Windows) en lugar de SSH
 ansible_connection: winrm
