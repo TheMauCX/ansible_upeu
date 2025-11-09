@@ -1,14 +1,20 @@
 ---
+# roles/configure_windows_clients/tasks/main.yml
 
 - name: "Clientes Windows | Establecer el plan de energía a 'Alto rendimiento'"
-  ansible.windows.win_power_plan:
-    name: 'High performance'
-    state: active
+  ansible.windows.win_shell: powercfg -setactive SCHEME_MIN
+  changed_when: false # El comando no reporta "cambio", así que lo forzamos
+  tags:
+    - optimizacion
 
 - name: "Clientes Windows | Deshabilitar la hibernación (libera espacio)"
   ansible.windows.win_shell: powercfg.exe /hibernate off
-  changed_when: false # Este comando no reporta cambio
+  changed_when: false
+  tags:
+    - optimizacion
 
 - name: "Clientes Windows | Confirmar software pre-instalado"
   ansible.builtin.debug:
     msg: "Este cliente Windows está listo. El software (Steam, Epic) fue pre-instalado en la VM Maestra."
+  tags:
+    - always
