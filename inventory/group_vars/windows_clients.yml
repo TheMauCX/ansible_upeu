@@ -13,6 +13,10 @@ ansible_connection: winrm
 ansible_winrm_server_cert_validation: ignore
 ansible_winrm_transport: ntlm
 
+# Variables añadidas para garantizar conexión HTTP y puerto
+ansible_port: 5985
+ansible_winrm_scheme: http
+
 # --- Variables del Rol ---
 # (El rol 'configure_windows_clients' usa estas)
 games_to_install:
