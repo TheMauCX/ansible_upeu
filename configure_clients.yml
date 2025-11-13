@@ -1,7 +1,0 @@
----
-- name: Configurar todos los clientes (Windows y Linux)
-  hosts:
-    - windows_clients_gamecenter
-    - linux_clients_academic
-  roles:
-    - role: configure_clients

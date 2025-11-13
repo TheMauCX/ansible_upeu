@@ -1,16 +1,33 @@
 ---
-- name: Instalar paquetes comunes
+# roles/common/tasks/main.yml
+- name: "Instalar repositorios base (dnf-plugins, EPEL)"
   ansible.builtin.dnf:
-    name: "{{ common_packages }}"
+    name:
+      - dnf-plugins-core
+      - epel-release  # <-- Paso 1: Instalar el repositorio
     state: present
-  when: ansible_os_family == "RedHat"
 
-- name: Habilitar y iniciar servicios del sistema
-  ansible.builtin.service:
+- name: "Habilitar repositorio CRB (para AlmaLinux 9+)"
+  ansible.builtin.command: dnf config-manager --set-enabled crb
+  changed_when: false
+  # Ignoramos errores si el comando falla (ej. en AlmaLinux 8)
+  ignore_errors: true
+
+- name: "Instalar paquetes base (git, htop, seguridad)"
+  ansible.builtin.dnf:
+    name:
+      - git
+      - htop          # <-- Paso 2: Ahora sí lo puede encontrar
+      - fail2ban
+      - firewalld
+    state: present
+
+- name: "Habilitar servicios base (chrony, firewalld, fail2ban)"
+  ansible.builtin.systemd:
     name: "{{ item }}"
+    enabled: true
     state: started
-    enabled: yes
   loop:
+    - chronyd
     - firewalld
     - fail2ban
-  when: ansible_os_family == "RedHat"

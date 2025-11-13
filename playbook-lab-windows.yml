@@ -1,0 +1,12 @@
+---
+- name: "Fase 2: Configurar Clientes del Game Center (Windows)"
+  hosts: windows_clients_gamecenter
+  become: false
+  
+  pre_tasks:
+    - name: "Verificar conectividad WinRM con los clientes"
+      ansible.windows.win_ping:
+      tags: [always]
+
+  roles:
+    - role: configure_windows_clients

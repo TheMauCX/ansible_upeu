@@ -1,0 +1,29 @@
+---
+- name: "Clientes Linux | Instalar dependencias para repositorios (curl, gpg)"
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gpg
+      - apt-transport-https
+    state: present
+    update_cache: yes
+
+- name: "Clientes Linux | Añadir la llave GPG de Microsoft"
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /etc/apt/trusted.gpg.d/microsoft.asc
+    mode: '0644'
+    force: true
+
+- name: "Clientes Linux | Añadir el repositorio de VS Code"
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://packages.microsoft.com/repos/code stable main"
+    state: present
+    filename: vscode
+
+- name: "Clientes Linux | Instalar software académico (code, gimp, etc)"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop: "{{ academic_software_to_install | split(',') }}"

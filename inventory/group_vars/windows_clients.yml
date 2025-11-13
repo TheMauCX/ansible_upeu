@@ -1,7 +1,18 @@
 ---
-ansible_connection: winrm
-ansible_winrm_server_cert_validation: ignore
+# --- Configuración de Conexión ---
 
-games_to_install:
-  - { name: 'steam' }
-  - { name: 'epicgameslauncher' }
+# Usuario administrador en tu VM cliente de Windows
+ansible_user: Cliente-Win11-Home
+ansible_password: "qwe123$"
+
+# ¡ESTA ES LA LÍNEA MÁGICA!
+# Le dice a Ansible que use WinRM en lugar de SSH
+ansible_connection: winrm
+
+# Ajustes de WinRM (casi siempre necesarios)
+ansible_winrm_server_cert_validation: ignore
+ansible_winrm_transport: ntlm
+
+# Variables añadidas para garantizar conexión HTTP y puerto
+ansible_port: 5985
+ansible_winrm_scheme: http

@@ -1,18 +1,37 @@
 ---
-- name: Gestionar cuentas de usuario
+- name: "Crear grupos de roles (admin, tech_lab)"
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - admin
+    - tech_lab
+
+- name: "Crear usuarios del laboratorio (franco, rodrigo)"
   ansible.builtin.user:
     name: "{{ item.name }}"
-    state: "{{ item.state | default('present') }}"
-    groups: "{{ item.groups | default(omit) }}"
+    comment: "{{ item.comment }}"
+    groups: "{{ item.groups }}"
     append: yes
-  loop: "{{ users_to_manage }}"
+    shell: /bin/bash
+    create_home: yes
+    password: "123456"
+  loop:
+    - { name: 'franco', comment: 'Admin Total (Entregable 2)', groups: 'wheel,admin' }
+    - { name: 'rodrigo', comment: 'Tecnico de Laboratorio (Entregable 2)', groups: 'tech_lab' }
 
-- name: Permitir al grupo 'wheel' ejecutar sudo sin contraseña
-  ansible.builtin.lineinfile:
-    path: /etc/sudoers.d/90-wheel-nopasswd
-    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
-    create: yes
-    owner: root
-    group: root
+- name: "Sudoers para Admin (full root)"
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/01-admin-upeu
     mode: '0440'
-    validate: 'visudo -cf %s'
+    content: |
+      # Permisos para rol Admin (franco)
+      %admin ALL=(ALL) NOPASSWD: ALL
+
+- name: "Sudoers para Tecnico (permisos limitados)"
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/02-tech-lab-upeu
+    mode: '0440'
+    content: |
+      # Permisos para rol Tecnico (rodrigo)
+      %tech_lab ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart *, /usr/bin/systemctl status *, /usr/bin/journalctl *

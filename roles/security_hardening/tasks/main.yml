@@ -1,28 +1,56 @@
 ---
-- name: Configurar SSH para que sea más seguro
-  ansible.builtin.lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?{{ item.key }}"
-    line: "{{ item.key }} {{ item.value }}"
-    validate: 'sshd -t -f %s'
+- name: "Instalar Fail2Ban y Firewalld"
+  ansible.builtin.dnf:
+    name:
+      - fail2ban
+      - firewalld
+    state: present
+
+- name: "Configurar jail de Fail2Ban para SSH"
+  ansible.builtin.template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+  notify: Reiniciar fail2ban
+
+- name: "Habilitar servicios de seguridad (firewalld, fail2ban)"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
   loop:
-    - { key: 'PermitRootLogin', value: 'no' }
-    - { key: 'PasswordAuthentication', value: 'no' }
-  notify: Reiniciar sshd
+    - firewalld
+    - fail2ban
 
-- name: Asegurar que SELinux esté en modo 'enforcing'
-  ansible.posix.selinux:
-    policy: targeted
-    state: enforcing
-  notify: Reiniciar el servidor
-
-- name: Añadir reglas de firewall para servicios (SSH y FOG)
+- name: "Configurar reglas de Firewall para FOG"
   ansible.posix.firewalld:
     service: "{{ item }}"
-    permanent: yes
+    permanent: true
     state: enabled
+    immediate: true
   loop:
     - ssh
     - http
     - https
-  notify: Recargar firewalld
+    - ftp
+    - tftp
+
+- name: "Copiar banner de advertencia de SSH"
+  ansible.builtin.copy:
+    src: sshd_banner.txt
+    dest: /etc/ssh/sshd_banner
+
+- name: "Reforzar configuración de sshd (sin root, sin password)"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+  loop:
+    - { key: 'PermitRootLogin', value: 'no' }
+    - { key: 'PasswordAuthentication', value: 'no' }
+    - { key: 'Banner', value: '/etc/ssh/sshd_banner' }
+  notify: Reiniciar sshd
+
+- name: "Asegurar que SELinux esté en modo 'enforcing'"
+  ansible.posix.selinux:
+    policy: targeted
+    state: enforcing
