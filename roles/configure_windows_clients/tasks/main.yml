@@ -18,3 +18,18 @@
     msg: "Este cliente Windows está listo. El software (Steam, Epic) fue pre-instalado en la VM Maestra."
   tags:
     - always
+    
+- name: "Clientes Windows | Crear tarea programada para iniciar servidor CS 1.6"
+  ansible.windows.win_scheduled_task:
+    name: "Servidor Dedicado CS 1.6"
+    description: "Inicia el servidor HLDS (CS 1.6) automáticamente al arrancar"
+    actions:
+      - path: 'C:\Program Files (x86)\Counter-Strike 1.6\hlds.exe'
+        arguments: "-game cstrike +sv_lan 1 +map de_dust2 +maxplayers 16 -nomaster -insecure -console"
+    triggers:
+      - type: at_startup
+    settings:
+      run_level: highest
+      stop_if_going_on_batteries: false
+      disallow_start_if_on_batteries: false
+    state: present
