@@ -17,7 +17,7 @@
   ansible.windows.win_copy:
     content: |
       cd "C:\Program Files (x86)\Counter-Strike 1.6"
-      "C:\Program Files (x86)\Counter-Strike 1.6\hlds.exe" -game cstrike +sv_lan 1 +map de_dust2 +maxplayers 16 -nomaster -insecure -console
+      "C:\Program Files (x86)\Counter-Strike 1.6\hlds.exe" -game cstrike +sv_lan 0 +map de_dust2 +maxplayers 16 -nomaster -insecure -console
     dest: C:\CS16_Server_Start.bat
 
 - name: "Clientes Windows | Crear e iniciar el servicio para el servidor de CS 1.6"
