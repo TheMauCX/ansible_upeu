@@ -13,15 +13,15 @@
   tags:
     - optimizacion
 
-- name: "Clientes Windows | Crear el servicio para el servidor de CS 1.6"
+- name: "Clientes Windows | Crear e iniciar el servicio para el servidor de CS 1.6"
   ansible.windows.win_service:
     name: "CS16_Server_UPeU"
     display_name: "CS 1.6 Dedicated Server (LAN)"
     description: "Inicia el servidor HLDS para el Game Center"
-    # SOLUCIÓN: Incluir la ruta completa y los argumentos en el campo 'path'
+    # Corregido: Encapsulamos el ejecutable y argumentos en cmd.exe /c
     path: 'C:\Windows\System32\cmd.exe /c "C:\Program Files (x86)\Counter-Strike 1.6\hlds.exe -game cstrike +sv_lan 1 +map de_dust2 +maxplayers 16 -nomaster -insecure -console"'
     start_mode: auto
-    state: present
+    state: started # <-- Esto asegura que el servicio se crea Y se inicia.
 
 - name: "Clientes Windows | Iniciar el servicio del servidor de CS 1.6"
   ansible.windows.win_service:
