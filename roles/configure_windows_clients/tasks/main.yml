@@ -13,15 +13,25 @@
   tags:
     - optimizacion
 
+- name: "Clientes Windows | Crear script de inicio de servicio CS 1.6 (.bat)"
+  ansible.windows.win_copy:
+    content: |
+      "C:\Program Files (x86)\Counter-Strike 1.6\hlds.exe" -game cstrike +sv_lan 1 +map de_dust2 +maxplayers 16 -nomaster -insecure -console
+    dest: C:\CS16_Server_Start.bat
+    # Usamos comillas dobles en el ejecutable por si hay espacios en el path
+
 - name: "Clientes Windows | Crear e iniciar el servicio para el servidor de CS 1.6"
   ansible.windows.win_service:
     name: "CS16_Server_UPeU"
     display_name: "CS 1.6 Dedicated Server (LAN)"
     description: "Inicia el servidor HLDS para el Game Center"
-    # Corregido: Encapsulamos el ejecutable y argumentos en cmd.exe /c
-    path: 'C:\Windows\System32\cmd.exe /c "C:\Program Files (x86)\Counter-Strike 1.6\hlds.exe -game cstrike +sv_lan 1 +map de_dust2 +maxplayers 16 -nomaster -insecure -console"'
+    # El path ahora es el script .bat simple
+    path: C:\CS16_Server_Start.bat
     start_mode: auto
-    state: started # <-- Esto asegura que el servicio se crea Y se inicia.
+    state: started
+    # FIX: Añadir el usuario y la contraseña del servicio
+    username: "{{ ansible_user }}"
+    password: "{{ ansible_password }}"
 
 - name: "Clientes Windows | Iniciar el servicio del servidor de CS 1.6"
   ansible.windows.win_service:
