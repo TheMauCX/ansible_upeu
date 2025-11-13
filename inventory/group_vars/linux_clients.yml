@@ -1,6 +1,7 @@
 ---
 
 ansible_user: linux
+ansible_password: "123456"
 
 ansible_become_password: "123456"
 academic_software_to_install:

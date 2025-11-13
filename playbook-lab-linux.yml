@@ -1,0 +1,12 @@
+---
+- name: "Fase 3: Configurar Clientes del Laboratorio (Linux Mint)"
+  hosts: linux_clients_academic
+  become: true # 'apt' requiere sudo
+  
+  pre_tasks:
+    - name: "Verificar conectividad SSH con los clientes"
+      ansible.builtin.ping:
+      tags: [always]
+
+  roles:
+    - role: configure_linux_clients
